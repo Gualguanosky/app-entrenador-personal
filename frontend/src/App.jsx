@@ -5,7 +5,7 @@ import PrivateRoute from './utils/PrivateRoute';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/app-entrenador-personal">
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
