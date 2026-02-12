@@ -7,26 +7,25 @@ const AuthContext = createContext();
 
 export default AuthContext;
 
+const decodeToken = (token) => {
+    if (!token) return null;
+    if (token === 'mock-access-token') {
+        return { username: 'demo_user', first_name: 'Usuario', is_trainer: false };
+    }
+    try {
+        return jwtDecode(token);
+    } catch (e) {
+        console.error("Error decoding token", e);
+        return null;
+    }
+}
+
 export const AuthProvider = ({ children }) => {
     let [authTokens, setAuthTokens] = useState(() => {
         const token = localStorage.getItem('access_token');
         return token ? { access: token, refresh: localStorage.getItem('refresh_token') } : null;
     });
-    let [user, setUser] = useState(() => {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            if (token === 'mock-access-token') {
-                return { username: 'demo_user', first_name: 'Usuario', is_trainer: false };
-            }
-            try {
-                return jwtDecode(token);
-            } catch (e) {
-                console.error("Error decoding token", e);
-                return null;
-            }
-        }
-        return null;
-    });
+    let [user, setUser] = useState(() => decodeToken(localStorage.getItem('access_token')));
     let [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
@@ -43,7 +42,7 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('access_token', response.data.access);
                 localStorage.setItem('refresh_token', response.data.refresh);
                 setAuthTokens(response.data);
-                setUser(jwtDecode(response.data.access));
+                setUser(decodeToken(response.data.access));
                 navigate('/');
             } else {
                 alert('Something went wrong!');
@@ -63,10 +62,10 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (authTokens) {
-            setUser(jwtDecode(localStorage.getItem('access_token')))
+            setUser(decodeToken(localStorage.getItem('access_token')))
         }
         setLoading(false)
-    }, [authTokens, loading])
+    }, [authTokens])
 
 
     let contextData = {
