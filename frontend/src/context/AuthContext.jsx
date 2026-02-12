@@ -8,8 +8,22 @@ const AuthContext = createContext();
 export default AuthContext;
 
 export const AuthProvider = ({ children }) => {
-    let [authTokens, setAuthTokens] = useState(() => localStorage.getItem('access_token') ? JSON.parse(localStorage.getItem('access_token')) : null);
-    let [user, setUser] = useState(() => localStorage.getItem('access_token') ? jwtDecode(localStorage.getItem('access_token')) : null);
+    let [authTokens, setAuthTokens] = useState(() => {
+        const token = localStorage.getItem('access_token');
+        return token ? { access: token, refresh: localStorage.getItem('refresh_token') } : null;
+    });
+    let [user, setUser] = useState(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            try {
+                return jwtDecode(token);
+            } catch (e) {
+                console.error("Error decoding token", e);
+                return null;
+            }
+        }
+        return null;
+    });
     let [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();

@@ -1,6 +1,10 @@
 from rest_framework import generics, permissions
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import CustomUser
-from .serializers import UserSerializer
+from .serializers import UserSerializer, MyTokenObtainPairSerializer
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 class ClientListView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.filter(is_trainer=False)
