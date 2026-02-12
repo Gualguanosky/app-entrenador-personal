@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
     let [user, setUser] = useState(() => {
         const token = localStorage.getItem('access_token');
         if (token) {
+            if (token === 'mock-access-token') {
+                return { username: 'demo_user', first_name: 'Usuario', is_trainer: false };
+            }
             try {
                 return jwtDecode(token);
             } catch (e) {
